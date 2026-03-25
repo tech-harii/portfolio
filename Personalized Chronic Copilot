@@ -1,3 +1,10 @@
+# Summary
+
+**ChronicCopilot** is a personalized AI-driven chronic disease management system that solves fragmented, reactive healthcare by integrating real-time wearable data (CGM, smartwatch), medication schedules, and lab results into a closed-loop care platform. Rather than one-size-fits-all reminders, it builds a dynamic patient-specific baseline, applies dual-layer safety (clinical rules + ML anomaly detection), and delivers adaptive nudges at the right moment—escalating to clinicians via structured FHIR alerts before deterioration occurs.
+
+The core novelty lies in orchestration: multimodal personalization across multiple chronic conditions, hybrid safety architecture, risk-trajectory-based escalation (not just threshold crossing), and reimbursement-native design that auto-captures RPM billing evidence. Built on FastAPI + FastMCP + PostgreSQL (+ TimescaleDB), the system exposes tools for anomaly detection, risk scoring, nudge generation, and FHIR task routing, enabling LLM agents to reason over patient safety constraints while remaining auditable and clinically accountable.
+
+A 12-week MVP roadmap spans data integration, clinical guardrails, anomaly detection, patient copilot, care-team console, and pilot evaluation—targeting 3–4 chronic conditions (diabetes, hypertension, COPD) with measurable KPIs: fewer exacerbations, faster escalation, improved adherence, clean RPM claims, and low alert false-positive rates.
 
 ## One-line concept
 
