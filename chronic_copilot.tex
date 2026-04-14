@@ -1,0 +1,153 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{xurl}
+\makeatletter
+\g@addto@macro\UrlBreaks{\do\/\do-\do_}
+\makeatother
+\usepackage[hidelinks]{hyperref}
+
+\begin{document}
+
+\title{ChronicCopilot: A Multimodal Closed-Loop Architecture for Personalized Chronic Disease Management with Hybrid Safety, FHIR Escalation, and RPM Evidence}
+
+\author{
+\IEEEauthorblockN{Author One\IEEEauthorrefmark{1},
+Author Two\IEEEauthorrefmark{1},
+and Author Three\IEEEauthorrefmark{2}}
+\IEEEauthorblockA{\IEEEauthorrefmark{1}Organization Name, Department, City, Country, email@domain}
+\IEEEauthorblockA{\IEEEauthorrefmark{2}Affiliation, City, Country, email@domain}
+}
+
+\maketitle
+
+\begin{abstract}
+Chronic diseases such as diabetes mellitus, hypertension, and chronic obstructive pulmonary disease (COPD) require continuous, patient-specific management, yet clinical workflows remain fragmented across wearables, medications, laboratory systems, and electronic health records (EHRs). We present \emph{ChronicCopilot}, a closed-loop digital care architecture that integrates real-time physiological and behavioral streams with longitudinal clinical context to deliver adaptive micro-interventions while maintaining auditable safety constraints. The system combines (i) a patient-specific dynamic baseline engine, (ii) a dual-layer risk stack coupling explainable clinical guardrails with statistical and machine-learning anomaly detection, (iii) a constrained adaptive nudging policy that selects intervention type, timing, and channel using feedback data, (iv) an escalation orchestrator that ranks provider actions using risk trajectory and service-level objectives, and (v) a reimbursement-aware audit layer that captures remote patient monitoring (RPM) evidence alongside clinical events. We describe an implementation blueprint using FastAPI orchestration, a Model Context Protocol (MCP) tool surface for controlled agent actions, PostgreSQL with time-series storage, and FHIR-native artifacts (e.g., Task, CommunicationRequest) for care-team workflow integration. We outline evaluation metrics spanning clinical risk reduction, alert burden, adherence, and billing completeness, and discuss regulatory, safety, and deployment considerations for pilot-scale validation.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Chronic disease management, remote patient monitoring, digital health, anomaly detection, FHIR, clinical decision support, reinforcement learning, patient safety, healthcare interoperability
+\end{IEEEkeywords}
+
+\section{Introduction}
+Chronic conditions account for a large share of morbidity and healthcare expenditure in the United States and globally. Patients generate rich longitudinal signals from continuous glucose monitors (CGM), consumer and clinical wearables, medication-taking behavior, patient-reported symptoms, and laboratory testing. Despite increased availability of these data, care delivery often remains episodic: clinicians may observe deterioration late, after preventable acute events become likely. Meanwhile, generic reminder applications frequently fail to adapt to individual response patterns, contributing to poor adherence and alert fatigue among clinicians who receive unstructured, low-priority notifications.
+
+Recent advances in machine learning (ML) and large language models (LLMs) enable more natural patient coaching and summarization, but unconstrained generative recommendations pose safety and accountability risks in medicine. A practical chronic-care copilot must therefore integrate learning with deterministic clinical constraints, structured interoperability, and traceability suitable for quality assurance and---where applicable---billing documentation.
+
+This paper contributes a system-oriented description of ChronicCopilot, emphasizing an \emph{orchestration-centric} design: multimodal fusion, hybrid safety, tool-mediated agent actions, FHIR-based escalation, and RPM evidence capture as first-class events. Our goal is to provide an implementable reference architecture and evaluation plan for pilot studies, not to claim superiority of a single ML model in isolation.
+
+\section{Related Work}
+\textbf{Remote monitoring and digital phenotyping.} RPM programs and connected devices have expanded measurement frequency beyond clinic visits; CMS provides frameworks for reimbursing remote physiologic monitoring when operational requirements are met \cite{cmsrpm,cmsvalue}. Prior work demonstrates feasibility of predicting exacerbations and supporting self-management using wearable and smartphone data in COPD and related populations \cite{copdml}.
+
+\textbf{Personalized diabetes technologies.} CGM-supported management has improved glycemic outcomes in multiple settings; commercial ecosystems include personalized alerting and decision support, often with device-specific constraints \cite{cgmoutcomes}. Reinforcement learning and contextual bandits have been studied for personalizing adherence messaging, including randomized trial evidence for improved medication adherence in type 2 diabetes \cite{reinforce}.
+
+\textbf{Interoperability and agent tooling.} HL7 FHIR enables structured exchange of tasks and communications into provider workflows. Emerging frameworks connect LLMs to FHIR servers via tool protocols, highlighting the need for auditable, policy-governed access patterns \cite{mcpfhir}.
+
+\textbf{Positioning.} ChronicCopilot differs from single-modality RPM dashboards by emphasizing \emph{cross-stream} reasoning (e.g., medication adherence plus physiologic trend), \emph{trajectory-based} escalation, and \emph{coupled} operational objectives (clinical risk and documentation completeness). It differs from chat-only copilots by requiring safety-critical operations through deterministic tools with versioned policies.
+
+\section{System Overview}
+Figure~\ref{fig:arch} summarizes the architecture. Ingestion normalizes heterogeneous streams into a longitudinal timeline stored in a relational and time-series capable database. A baseline engine maintains patient-specific reference behavior. A hybrid risk layer outputs a structured risk estimate with factor attributions. Patient-facing interventions are generated from a constrained policy set; escalations create FHIR tasks routed to care teams. All patient- and clinician-facing actions emit audit events, including RPM evidence where applicable.
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox{0.92\linewidth}{\centering
+\vspace{2pt}\textbf{Wearables / CGM / Devices}\\
+$\downarrow$\\
+\textbf{Ingestion \& Normalization} $\leftarrow$ \textbf{Medications, Labs, FHIR/EHR}\\
+$\downarrow$\\
+\textbf{Patient Digital Baseline Engine}\\
+$\downarrow$\\
+\textbf{Hybrid Risk Layer} (rules + ML anomaly)\\
+$\swarrow$ \hspace{2.2cm} $\searrow$\\
+\textbf{Patient Copilot} \hspace{1.1cm} \textbf{Escalation Orchestrator}\\
+$\searrow$ \hspace{3.2cm} $\swarrow$\\
+\textbf{Audit \& RPM Evidence Store} $\rightarrow$ \textbf{Outcomes, QA, Billing Ops}
+\vspace{2pt}}}
+\caption{High-level ChronicCopilot architecture. Safety-critical actions are executed via deterministic services and tool APIs; LLM agents reason over tool outputs under policy constraints.}
+\label{fig:arch}
+\end{figure}
+
+\section{Data Model and Ingestion}
+\textbf{Streams.} Device streams include timestamped metric types (e.g., interstitial glucose, blood pressure, heart rate, SpO$_2$, activity). Ingestion assigns provenance metadata (device, firmware, quality flags) and enforces deduplication strategies to avoid double counting during retries.
+
+\textbf{Medications and adherence.} Scheduled doses and observed taking events enable computation of adherence windows, missed doses, and timing deviations, which contextualize physiologic signals.
+
+\textbf{Laboratory and EHR data.} Laboratory results provide slower-moving clinical anchors (e.g., HbA1c, renal function) used for guardrails and baseline conditioning.
+
+\textbf{Storage.} PostgreSQL serves as the system of record; time-indexed streams may be stored in hypertables (e.g., TimescaleDB) for efficient range queries supporting timeline retrieval and model features.
+
+\section{Patient-Specific Baseline Engine}
+The baseline engine estimates a patient-specific ``normal'' for each relevant stream using rolling statistics (e.g., exponentially weighted moving averages, robust z-scores) with explicit cold-start rules based on population priors and clinician-configured bounds. Baselines are computed with leakage controls: features for anomaly scoring exclude the immediate evaluation window where required.
+
+\section{Hybrid Risk Layer}
+\subsection{Clinical guardrails}
+Deterministic rules encode consensus thresholds, contraindicated states, and mandatory escalation paths reviewed by clinical stakeholders. Guardrails always override model suggestions when conflicts arise.
+
+\subsection{Anomaly detection}
+Anomaly scores combine deviation-from-baseline measures with stream-specific models. An MVP may use univariate robust statistics; later phases may incorporate multivariate models (e.g., isolation forest, temporal autoencoders), subject to monitoring and governance.
+
+\subsection{Risk scoring and trajectory}
+The risk module outputs a scalar score, tier, and structured factor list for explainability. Trajectory features (slope, persistence, cross-signal concordance) differentiate gradual drift from transient noise and support prioritization beyond single-threshold alarms.
+
+\section{Adaptive Nudging Under Constraints}
+Nudges are selected from a finite library of templates (medication prompts, activity suggestions, symptom checks, education snippets). A contextual bandit or constrained reinforcement learning policy optimizes channel and timing using response feedback (accept, snooze, ignore) under hard caps on frequency and interruptibility. Clinical guardrails restrict content classes: the system does not infer medication dosing changes without appropriate clinical pathways.
+
+\section{Escalation Orchestrator and FHIR Integration}
+Escalations generate structured FHIR resources such as \texttt{Task} and \texttt{CommunicationRequest} with coded reasons, severity, and SLA targets. The orchestrator ranks items using predicted near-term risk, patient engagement state, and care-team workload policies. Idempotency keys prevent duplicate tasks for the same underlying clinical event.
+
+\section{Audit Trail and RPM Evidence}
+RPM programs require documentation of device usage, transmitted readings, and management time for eligible services \cite{cmsrpm}. ChronicCopilot logs qualifying interactions (e.g., review minutes, synchronous communication types) as append-only audit events linked to patient identifiers and month keys, enabling monthly rollups for operational billing review. This design couples clinical escalation with operational traceability rather than treating billing as an afterthought.
+
+\section{Agent Interface via MCP}
+We expose deterministic tools (e.g., timeline retrieval, risk scoring, anomaly detection, nudge option generation, FHIR alert creation, RPM logging) through a Model Context Protocol server. LLM agents consume tool outputs rather than directly mutating clinical state, improving auditability. Policy versioning applies to tool-mediated actions.
+
+\section{Security and Governance}
+Deployment under HIPAA requires administrative, physical, and technical safeguards: role-based access control, encryption in transit and at rest, audit logs, and business associate agreements where applicable. Model and policy updates should follow change control with drift monitoring and clinician feedback loops for alert quality.
+
+\section{Evaluation Plan}
+Pilot evaluation should pre-specify endpoints aligned to clinical and operational goals:
+\begin{itemize}
+  \item \textbf{Clinical proxies:} reduced severe hypo/hyperglycemia events (diabetes cohorts), blood pressure variability or emergency utilization (hypertension), exacerbation proxies (COPD), as feasible.
+  \item \textbf{Operational:} time-to-first meaningful care-team action for high-severity escalations; alert precision metrics with clinician labeling.
+  \item \textbf{Engagement:} adherence improvements; nudge response rates.
+  \item \textbf{Financial operations:} RPM documentation completeness and claim-ready summary accuracy (internal QA).
+\end{itemize}
+Statistical analysis should prespecify handling of missing data, seasonality, and confounding in observational pilot designs.
+
+\section{Limitations and Future Work}
+This paper describes an architecture rather than reporting empirical outcomes. Future work includes prospective trials, fairness analysis across subpopulations, tighter integration with institution-specific order sets, and advanced multivariate anomaly models with rigorous calibration.
+
+\section{Conclusion}
+ChronicCopilot frames chronic disease management as a closed-loop, multimodal orchestration problem combining patient baselines, hybrid safety, constrained adaptive interventions, FHIR-native escalation, and RPM-aware auditing. The proposed design prioritizes clinical accountability and interoperability while enabling modern LLM agents through tool-mediated interfaces. Pilot implementation should emphasize rule-first safety, measurable endpoints, and continuous monitoring of alert burden and model drift.
+
+\section*{Acknowledgment}
+Replace with funding acknowledgments and contributor roles as appropriate. Remove if not required.
+
+\begin{thebibliography}{00}
+
+\bibitem{cmsrpm}
+Centers for Medicare \& Medicaid Services, ``Medicare Telehealth: Remote Patient Monitoring,'' CMS fact sheets and coverage guidance (accessed 2026). [Online]. Available: \url{https://www.cms.gov/medicare/coverage/telehealth/remote-patient-monitoring}
+
+\bibitem{cmsvalue}
+Centers for Medicare \& Medicaid Services, ``Better Care, Smarter Spending, Healthier People: Paying Providers for Value, Not Volume,'' CMS newsroom fact sheets (accessed 2026). [Online]. Available: \url{https://www.cms.gov/newsroom/fact-sheets/better-care-smarter-spending-healthier-people-paying-providers-value-not-volume}
+
+\bibitem{copdml}
+Representative literature on COPD exacerbation prediction using wearables and ML; see, e.g., recent cohort and modeling studies in respiratory and digital health journals (2019--2025). (Citations are illustrative; replace with specific studies used in your evaluation.)
+
+\bibitem{cgmoutcomes}
+Examples of CGM-supported management outcomes in type 2 diabetes and related populations; replace with primary trial and review citations selected for your target cohort.
+
+\bibitem{reinforce}
+A. R. et al., ``The impact of using reinforcement learning to personalize communication on medication adherence: findings from the REINFORCE trial,'' \emph{npj Digital Medicine}, 2024. [Online]. Available: \url{https://doi.org/10.1038/s41746-024-01028-5}
+
+\bibitem{mcpfhir}
+Example framework for MCP-FHIR integration for clinical decision support (2025). Replace with the specific arXiv or venue citation you standardize on in your bibliography (e.g., arXiv:2506.13800).
+
+\end{thebibliography}
+
+\end{document}
