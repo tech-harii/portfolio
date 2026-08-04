@@ -1,0 +1,43 @@
+3. Implement Automatic Domain Mapping (Just-in-Time Provisioning)
+To make the signup flow seamless:
+
+When a user clicks "Sign in with Google/Microsoft", check their email domain (e.g., alice@acmecorp.com).
+If acmecorp.com is already linked to a company in your database, automatically drop them into the Acme Corp tenant.
+If it's a new domain, you can automatically provision a new isolated tenant workspace for them.
+
+
+4. Add Granular Role-Based Access Control (RBAC)
+Now that you have real users logging in (not just generic company profiles), you can implement roles within the company context.
+
+E.g., X-Company-ID: Acme AND Role: Admin vs Role: Auditor.
+This allows you to restrict who can upload new knowledge base files versus who can only run the RAG queries.
+
+5. Enhanced Audit Logging (Crucial for FinTech)
+Since "ClearDiligence" / "ClaimGuard" operate in the FinTech/compliance space, having OAuth means you now have a verifiable user_id. You should log exactly which user initiated a RAG query or uploaded a policy document, rather than just logging that the action happened in the company workspace.
+
+Summary: Your instinct is 100% correct. Dropping the manual "change company" button for proper OAuth token-based isolation is exactly how modern SaaS architectures handle multi-tenancy.
+
+
+1. Visualize the "Agentic Brain" (The Wow Factor)
+Don't just show the final answer. Expose the Multi-Agent workflow in the UI.
+
+Add a "Thought Process" or "Agent Trace" panel in the frontend.
+Show the user exactly what is happening in real-time:
+🧠 Planner Agent is analyzing the claim...
+🔎 Retriever Agent found 3 relevant policy documents.
+⚖️ Reviewer Agent is verifying compliance...
+Why it wins: It proves you actually built a sophisticated multi-agent system rather than just wrapping a simple ChatGPT API call.
+
+
+3. Source Citations & Explainability
+Since this is FinTech (ClearDiligence/ClaimGuard), trust is everything.
+
+When your RAG system outputs a decision, make sure the frontend highlights exactly which sentence in the uploaded policy led to that decision.
+Provide clickable links or snippets (e.g., "According to Section 3.2 of the Q3 Policy...").
+
+
+4. "One-Click" Executive Report (PDF Export)
+Hackathon judges (and enterprise buyers) love tangible outputs.
+
+Add a button to generate a clean, branded PDF report of a compliance review or claim adjudication.
+Even a simple HTML-to-PDF tool on the frontend capturing the RAG output and the citations looks incredibly professional.
