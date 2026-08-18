@@ -53,3 +53,63 @@ Here's my honest, opinionated ranking. The deeper research changed one big thing
   (https://reskilll.com/blogs/sih-2026-problem-statements-how-to-choose-right-one-team/) · 2022 winner's tips (https://www.anishprashun.me/blog/sih-2025-tips-and-common-mistakes) · How to win SIH 2026
   (https://thenewviews.com/how-to-win-smart-india-hackathon/) · SIH 2025 winners (J&K) (https://eduadvice.in/educational-news-details/smart-india-hackathon-2025-winners-announced/9101) · CGWB winners tweet
   (https://x.com/CGWB_CHQ/status/1999389032535806266) · Velonx first-timer guide (https://velonx.in/blog/sih-2026-first-timers-guide-everything-you-need-to-know-before-you-register)
+
+Here's a detailed paragraph on each of the six topics, written so you can lift them almost directly into an SIH idea submission or internal-hackathon pitch.
+
+  1. Sarkari Saathi — AI Scheme-Eligibility Discovery Agent
+
+  India runs over 3,000 central and state welfare schemes, yet a large share of eligible citizens never apply because they simply don't know a scheme exists, can't parse eligibility criteria written in bureaucratic English, or don't know which
+  documents to gather. Sarkari Saathi is a multilingual conversational agent, built on a RAG pipeline over the myScheme corpus, that inverts the discovery process: instead of the citizen searching, the agent interviews them in their own
+  language ("What do you do? How much land? Any disability in the family? Which state?") and then produces a ranked list of every scheme they qualify for, with plain-language explanations of benefits, a personalized document checklist, and
+  step-by-step application guidance. Each answer carries citations back to the official scheme page so nothing is hallucinated. The system is delivered as a lightweight, offline-tolerant PWA and a WhatsApp bot, with Bhashini powering voice
+  input for low-literacy users. The impact story is direct and measurable — every percentage point of improved scheme uptake translates to crores of rupees reaching intended beneficiaries — and the demo writes itself: a judge watches a
+  fictional widowed farmer in Bihar discover seven schemes she'd never heard of, in Hindi, in under two minutes.
+
+  2. JalGPT — Conversational Analytics over Groundwater Data
+
+  The Central Ground Water Board and state agencies sit on massive datasets — INGRES assessment data, real-time DWLR (Digital Water Level Recorder) telemetry, decades of assessment reports — but a district collector or block officer who wants
+  an answer must either dig through PDFs or file a request to a technical cell. JalGPT is a conversational analytics layer over this data: an official types (or speaks, in any Indian language) "Which blocks in Marathwada moved from
+  semi-critical to over-exploited since 2022, and what's the trend?" and an agentic pipeline plans the query, translates it into SQL against the structured groundwater database, retrieves supporting passages from CGWB reports via RAG, and
+  returns a cited natural-language answer with auto-generated charts and maps. The architecture combines text-to-SQL for numeric questions, document RAG for policy and methodology questions, and a visualization generator — the same pattern that
+  made FloatChat the flagship RAG problem statement of SIH 2025, applied to a dataset with two consecutive years of winning problem statements behind it. The pitch to judges is decision-speed: turning a two-week data-request cycle into a
+  ten-second conversation for the officials who allocate borewell permissions and drought relief.
+
+  3. NyayaSetu — Multilingual Legal-Aid & Grievance RAG Assistant
+
+  With the IPC, CrPC, and Evidence Act replaced by the Bharatiya Nyaya Sanhita, BNSS, and BSA, even police officers and lawyers are struggling with section mappings — and ordinary citizens, who already found the law inaccessible, are further
+  adrift. NyayaSetu is a RAG assistant grounded exclusively in the official texts of the new codes, the Constitution, and key citizen-facing acts (consumer protection, RTI, domestic violence, motor vehicles). A citizen describes their situation
+  in any Indian language — "my employer hasn't paid me for three months," "police refused to register my complaint" — and the system identifies the relevant legal provisions, explains them in simple language with exact section citations, maps
+  old IPC sections to new BNS equivalents where needed, drafts the text of an FIR, complaint, or RTI application, and routes the user to the correct forum (police, labour commissioner, consumer court, CPGRAMS). Crucially, it is engineered to
+  inform, not advise: every response cites its source sections, and it refuses to predict case outcomes — a guardrail posture that resonates strongly with Department of Justice judges. The freshness of the new criminal codes gives the project a
+  topical hook no recycled idea from previous years can match.
+
+  4. PSU KnowledgeGPT — RAG over Technical Documentation of a Public-Sector Undertaking
+
+  This is the strategically smartest build on the list, even if it's the least glamorous. PSUs like Coal India, NTPC, GAIL, Indian Railways (RDSO), and Powergrid each maintain tens of thousands of pages of safety circulars, maintenance manuals,
+  inspection reports, and standard operating procedures — and every year they post SIH problem statements asking for an AI system that lets a field engineer or safety officer query this corpus instead of hunting through PDFs. The solution is a
+  domain-tuned RAG system: documents are ingested with structure-aware chunking (tables, clause numbers, and diagrams preserved), indexed in a vector store with metadata filters (document type, plant, date, supersession status), and served
+  through a chat interface that answers questions like "what is the mandatory ventilation requirement for a degree-III gassy mine?" with the exact clause, document number, and a flag if a newer circular supersedes it. Add voice input for field
+  use and an admin dashboard showing which documents get queried most. Because these ministry statements attract a fraction of the applicants that health or education statements do, the same RAG engineering that faces 500 rival teams elsewhere
+  might face 50 here — the single biggest lever on your actual probability of winning.
+
+  5. Arogya Sahayak — Multilingual Public Health Chatbot with Outbreak Awareness
+
+  Rural and semi-urban India faces a health-information gap that WhatsApp misinformation eagerly fills: wrong vaccination schedules, fake cures, panic during outbreaks. Arogya Sahayak is a voice-first, multilingual health chatbot grounded
+  strictly in verified sources — MoHFW guidelines, ICMR advisories, the Universal Immunization Programme schedule — with a live feed from IDSP outbreak bulletins so it can proactively alert users in affected districts ("dengue cases are rising
+  in your block; here's how to eliminate breeding sites"). It answers questions about symptoms, prevention, vaccination timelines, and nearby health facilities, delivered over WhatsApp and a basic IVR line so a feature-phone user is not
+  excluded. The differentiator — and the reason a team wins with this rather than the fifty other health chatbots in the room — is the safety architecture: the bot answers only from its curated corpus with citations, explicitly refuses to
+  diagnose or prescribe, escalates red-flag symptoms to a human helpline (104/108), and logs its refusals for audit. This was a real SIH 2025 problem statement and its underlying need recurs every year; presenting it as "a hallucination-proof
+  health information utility" rather than "a health chatbot" is what separates it before government judges.
+  
+  6. ShikshaMitra — NEP-2020 Career & Curriculum Advisor
+
+  NEP 2020 promises flexible, multidisciplinary education with multiple entry-exit points, but students in tier-2/3 towns — often first-generation learners with no access to career counselling — have no way to navigate it. ShikshaMitra is an
+  LLM-driven advisory platform with a knowledge base spanning NEP 2020 provisions, NSQF skill qualifications, scholarship schemes (NSP), entrance-exam pathways, and college/course data. A student converses with it in their own language about
+  interests, constraints ("I need to earn within two years," "I can't leave my district"), and academic record; an agentic planner then generates concrete, comparably-costed pathways — degree routes, vocational/ITI routes,
+  apprenticeship-embedded options — each with scholarship matches and timeline milestones, exportable as a plan the student can share with parents. A companion dashboard lets school counsellors and teachers track cohorts and spot students at
+  dropout risk. Career advisory was among the actual winning topics at SIH 2025's J&K nodal centre, so judge appetite is proven; the challenge is differentiation, which this version addresses through the constraint-aware pathway planning and
+  the counsellor-side analytics rather than a plain Q&A chatbot.
+  
+  ---
+  One practical note that applies to all six: they share roughly 70% of their architecture — multilingual ingestion, chunking and embedding, vector retrieval, citation-grounded generation, Bhashini translation, and a chat frontend. If you build
+  that common engine first, your team can commit to whichever matching official problem statement shows the lowest submitted-idea count when the SIH 2026 list drops, which is the strongest overall winning strategy. 
