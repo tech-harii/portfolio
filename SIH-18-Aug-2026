@@ -1,0 +1,55 @@
+Here's my honest, opinionated ranking. The deeper research changed one big thing in my thinking: the topic being "hot" is actually a risk, not an advantage. SIH 2025 had ~72,000 idea submissions for ~271 problem statements — glamorous AI
+  statements (like FloatChat) attracted enormous competition, while data-driven strategy analyses (https://www.scribd.com/document/903478555/Detailed-Report-on-SIH2025-Choosing-problem-statement) show niche-ministry statements (NTRO, Textiles,
+  Chemicals, Coal, Ayush) often get ~50 teams vs 500+ for MeitY/Health. Your real formula is: RAG/LLM skills (which judges now heavily favor) applied to an unglamorous ministry's data problem.
+
+  My ranked picks:
+
+  1. Scheme-Eligibility Discovery Agent ("Sarkari Saathi") — my top pick
+
+  Win probability: highest. Implementation: easy-medium.
+  RAG over myScheme's ~3,000 schemes → conversational eligibility interview in Hindi/English/one regional language → ranked eligible schemes + document checklist. Why I rank it #1: the data is public and clean (myScheme is scrapable/structured
+  — no messy NetCDF or sensor data), the demo is emotionally powerful in 3 minutes ("a widowed farmer discovers 7 schemes she didn't know about"), impact is instantly obvious to government judges, and the whole thing is buildable by a 6-person
+  team in well under 36 hours with a standard stack (embeddings + vector DB + LLM + Bhashini translation). It maps to rural development / social justice ministry statements, which are less saturated than MeitY.
+
+  2. Conversational Analytics over Groundwater Data ("JalGPT")
+
+  Win probability: high — proven pattern. Implementation: medium.
+  Text-to-SQL + RAG over INGRES/DWLR data with auto-generated charts. This exact shape has produced winners two years running (INGRES chatbot 2024, DWLR evaluation 2025 (https://x.com/CGWB_CHQ/status/1999389032535806266)), and Jal Shakti will
+  almost certainly repost a variant. The risk: because it's proven, competition is now moderate-high. Your differentiator must be the agentic query-planning + visualization layer, and pre-loading real CGWB data before the finale. Pick this if
+  your team is strong on data engineering.
+
+  3. Multilingual Legal-Aid & Grievance RAG ("NyayaSetu")
+
+  Win probability: high. Implementation: easy-medium.
+  RAG over the new criminal codes (BNS/BNSS/BSA) + Constitution + grievance categories, answering in plain language with exact section citations, drafting complaint text. The new codes are a genuine freshness hook — most citizens and even
+  police are still confused by the IPC→BNS mapping, and a section-mapper alone is a demo moment. Legal texts are perfectly clean RAG corpora (structured, sectioned, public). Department of Justice statements are less contested than MeitY ones.
+  Guardrails ("I cite, I don't advise") impress government judges.
+
+  4. RAG Assistant for a Niche PSU's Technical Documentation
+
+  Win probability: very high per-team odds. Implementation: medium. The contrarian pick.
+  Every year, PSUs like Coal India, NTPC, GAIL, Railways (RDSO), DRDO/NTRO post "AI system to search/summarize our manuals, safety circulars, inspection reports" statements that get a fraction of the applicants. It's the same RAG stack as topic
+  #1 but pointed at, say, mine-safety regulations or railway maintenance manuals. Less glamorous, dramatically better odds — this is what the strategy data (https://reskilll.com/blogs/sih-2026-problem-statements-how-to-choose-right-one-team/)
+  actually supports. When the 2026 problem statements drop, filter for low submitted-idea counts on RAG-shaped PSU statements and pounce.
+
+  5. Public Health Chatbot with Outbreak Alerts ("Arogya Sahayak")
+
+  Win probability: medium-high. Implementation: easy.
+  It was a real 2025 statement and will likely recur, and it's the easiest build on this list (curated health corpus + WhatsApp interface + Bhashini). But health attracts heavy competition, so you only win with hard differentiation:
+  citation-only answers, refusal-to-diagnose guardrails, IVR/voice for non-smartphone users, and live IDSP outbreak integration. Choose this only if your team can nail the safety story.
+
+  6. NEP-2020 Career & Curriculum Advisor ("ShikshaMitra")
+
+  Win probability: medium. Implementation: easy.
+  Career advisory literally won at SIH 2025 (https://eduadvice.in/educational-news-details/smart-india-hackathon-2025-winners-announced/9101), which proves judges like it — but that also means 2026 will see many copies. I rank it last of the
+  six: easiest to build, hardest to differentiate. Viable mainly for state-government problem statements at less-contested nodal centres.
+
+  My bottom-line advice: commit to topics #1 and #4 as your strategy pair. Build the generic multilingual-RAG-with-citations engine now (it's the same core for all six), then when SIH 2026 problem statements are released (~August–September),
+  check the official "Submitted Ideas Count" column and slot your engine into whichever matching statement has the lowest competition. Past winners consistently say answering every word of the official PS
+  (https://www.anishprashun.me/blog/sih-2025-tips-and-common-mistakes) and having a working demo beat topic glamour — and remember your first battle is the internal college hackathon
+  (https://velonx.in/blog/sih-2026-first-timers-guide-everything-you-need-to-know-before-you-register), not the finale.
+
+  Sources: SIH 2025 PS strategy guide (https://www.scribd.com/document/903478555/Detailed-Report-on-SIH2025-Choosing-problem-statement) · Reskilll: choosing the right PS
+  (https://reskilll.com/blogs/sih-2026-problem-statements-how-to-choose-right-one-team/) · 2022 winner's tips (https://www.anishprashun.me/blog/sih-2025-tips-and-common-mistakes) · How to win SIH 2026
+  (https://thenewviews.com/how-to-win-smart-india-hackathon/) · SIH 2025 winners (J&K) (https://eduadvice.in/educational-news-details/smart-india-hackathon-2025-winners-announced/9101) · CGWB winners tweet
+  (https://x.com/CGWB_CHQ/status/1999389032535806266) · Velonx first-timer guide (https://velonx.in/blog/sih-2026-first-timers-guide-everything-you-need-to-know-before-you-register)
